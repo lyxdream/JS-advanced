@@ -338,7 +338,8 @@ export {}
   - emit  就是让数组中的方法依次执行 （发布）
 
 - 把需要做的事放到一个数组中，等会儿事情发生了让订阅的事依次执行
-  ```js
+
+```js
 let fs = require('fs')
 let school = {}
 
@@ -372,7 +373,7 @@ fs.readFile('./age.txt', 'utf8', function (err, data) {
     event.emit()
 })
 
-  ```
+```
 
 ```js
 // on的时候收集了两个函数进去，
