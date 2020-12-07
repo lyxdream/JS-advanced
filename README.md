@@ -97,7 +97,7 @@ console.log(isType([], 'Array'))
 
 柯里化的定义：柯里化是将使用多个参数的一个函数，通过拆分参数的方式，转换成一系列使用一个参数的函数。
 
-函数的柯里化，返回的是一个函数的函数。其实现方式是需要依赖参数以及递归，通过拆分参数的方式，来调用一个多参数的函数方法，增加可读性的目的。
+函数的柯里化，返回的是一个参数的函数。其实现方式是需要依赖参数以及递归，通过拆分参数的方式，来调用一个多参数的函数方法，增加可读性的目的。
 
 ```js
 
@@ -172,6 +172,33 @@ const curring = (fn:Function) =>{//sum
 }
 
 
+```
+**反柯里化**
+
+  - 柯里化：方法的范围变小了（isType => isString/isArray） 方法的范围变小了
+  - 反柯里化：范围变大了
+
+```js
+//   ---------分割线----------------------
+/*  let toString = Object.prototype.toString;
+   console.log(toString.call(123)) 
+*/
+//   ---------分割线----------------------
+  Function.prototype.unCurrying = function(){
+     return (...args)=>{ //将所有参数组成一个数组
+         /* this.call 这样调用call方法，可能并不是原型上的call方法，可能是用户自己定义的
+            防止用户自定义了call方法，这里调用原型上的call方法
+           借用原型上的call方法  apply：主要就是改变this,并且传入参数 
+           第一个call是找到call函数，第二个apply是让call执行
+           让call方法上的this变成了toString(...args),让toString执行
+           */
+         return Function.prototype.call.apply(this,args)
+     }
+  }
+  let toString = Object.prototype.toString.unCurrying();
+  //toString原来只是原型上的，现在变成全局的了，其他原型的方法都可以通过这样变为全局的方法
+  console.log(toString(123))
+  
 ```
 函数柯里化经典面试题：
 ```js
