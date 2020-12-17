@@ -790,7 +790,7 @@ interable[Symbol.iterator] = function() {
     let index = 0;
     return { // 遍历器对象
         next: () => {
-            return { value: this[index], done: index++ == this.length }
+            return { value: this[index], done: index++ >= this.length }
         }
     }
 }
@@ -824,6 +824,208 @@ console.log(iter.next())//{ value: 'c', done: false }
 console.log(iter.next())//{ value: undefined, done: true }
 
 ```
+
+### async
+
+- 同步的，底层还是异步的
+```js
+// 异步串行
+function *readAge(filePath){
+    let name =yield fs.readFile(filePath,'utf8');
+    let age = yield fs.readFile('/Users/yinxia/highFunction/src1/'+name,'utf8');
+    return age;
+}
+let it = readAge('/Users/yinxia/highFunction/src/name.txt');
+
+```
+
+(1)使用回调形式
+
+```js
+// generator---------------
+let {value,done} = it.next();
+Promise.resolve(value).then(data=>{
+    console.log(data)
+    let {value,done} = it.next(data);
+    Promise.resolve(value).then(data=>{
+        console.log(data)
+        let {value,done} = it.next(data);
+        console.log(value,done);
+    })
+})
+```
+
+(2)co-->tj
+
+ 安装co=>npm install co
+
+```js
+let co = require('co');
+co(readAge('/Users/yinxia/highFunction/src/name.txt')).then(data=>{
+    console.log(data)
+})
+```
+
+(3)vue-router =>beforeEach  next=>next=>next
+
+ - 实现co
+   - readAge('/Users/yinxia/highFunction/src/name.txt');//返回一个ite
+   - 还可以then,说明返回了一个promise
+
+ ```js
+ function co(it){
+    //递归 异步迭代（函数来迭代）   同步是forEach promise.all
+    return new Promise((resolve,reject)=>{
+        function next(val){
+            let {value,done} = it.next(val);  //val上一次产出的结果  value是yeild产出的结果
+            if(done){  //如果完成了就返回最终结果
+                resolve(value)
+            }else{
+                Promise.resolve(value).then(data=>{
+                    next(data)
+                },reject)  //有一个失败就失败了
+            }
+        }
+        next();
+    })
+    
+}
+co(readAge('/Users/yinxia/highFunction/src/name.txt')).then(data=>{
+    console.log(data)
+}).catch(e=>{
+    console.log(e,'错误')
+})
+ ```
+(4) it.throw('出错了')，抛错
+
+```js
+function *readAge(filePath){
+   try{
+        let name =yield fs.readFile(filePath,'utf8');
+        let age = yield fs.readFile('/Users/yinxia/highFunction/src1/'+name,'utf8');
+        return age;
+    }catch(e){
+        console.log(e)
+    }
+}
+function co(it){
+    //递归 异步迭代（函数来迭代）   同步是forEach promise.all
+    return new Promise((resolve,reject)=>{
+        function next(val){
+            let {value,done} = it.next(val);  //val上一次产出的结果  value是yeild产出的结果
+            if(done){  //如果完成了就返回最终结果
+                resolve(value)
+            }else{
+                   Promise.resolve(value).then(data=>{
+                        next(data)
+                },(err)=>{it.throw('出错了')
+                 }) 
+                //有一个失败就失败了
+            }
+        }
+        next();
+    })
+    
+}
+co(readAge('/Users/yinxia/highFunction/src/name.txt')).then(data=>{
+    console.log(data)
+})
+```
+（5）async + await
+
+```js
+let fs = require('fs').promises;
+async function readAge(filePath){
+    let name =await fs.readFile(filePath,'utf8');
+    let age = await fs.readFile('/Users/yinxia/highFunction/src/'+name,'utf8');
+     return age;
+ }
+ //async执行完后返回的就是一个promise
+//  async + await => generator + co
+//co自动解析yield方法，自动调用it.next()
+ readAge('/Users/yinxia/highFunction/src/name.txt').then(data=>{
+    console.log(data)
+}).catch(e=>{
+    console.log(e)
+})
+```
+(6)async + await
+
+```js
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);    //it.next(val)
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+
+function _asyncToGenerator(fn) {
+    return function () {
+        var self = this,
+            args = arguments;
+        return new Promise(function (resolve, reject) {
+            var gen = fn.apply(self, args);
+
+            function _next(value) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+
+            function _throw(err) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
+
+function readAge(_x) {
+    return _readAge.apply(this, arguments);
+} //async执行完后返回的就是一个promise
+
+function _readAge() {
+    _readAge = _asyncToGenerator( /*#__PURE__*/ regeneratorRuntime.mark(function _callee(filePath) {
+        var name, age;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+                switch (_context.prev = _context.next) {
+                    case 0:
+                        _context.next = 2;
+                        return fs.readFile(filePath, 'utf8');
+
+                    case 2:
+                        name = _context.sent;
+                        _context.next = 5;
+                        return fs.readFile('/Users/yinxia/highFunction/src/' + name, 'utf8');
+
+                    case 5:
+                        age = _context.sent;
+                        return _context.abrupt("return", age);
+
+                    case 7:
+                    case "end":
+                        return _context.stop();
+                }
+            }
+        }, _callee);
+    }));
+    return _readAge.apply(this, arguments);
+}
+
+readAge('/Users/yinxia/highFunction/src/name.txt').then(function (data) {
+    console.log(data);
+}).catch(function (e) {
+    console.log(e);
+});
+```
+
 
 
 
