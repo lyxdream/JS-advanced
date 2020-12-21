@@ -4,7 +4,7 @@
 /*  let toString = Object.prototype.toString;
    console.log(toString.call(123)) 
 */
-//   ---------分割线----------------------
+//  -------------------分割线----------------------
   Function.prototype.unCurrying = function(){
      return (...args)=>{ //将所有参数组成一个数组
         /* this.call 这样调用call方法，可能并不是原型上的call方法，可能是用户自己定义的
@@ -19,5 +19,9 @@
   let toString = Object.prototype.toString.unCurrying();
   //toString原来只是原型上的，现在变成全局的了，其他原型的方法都可以通过这样变为全局的方法
   console.log(toString(123))
+
+
+
+  
   
   

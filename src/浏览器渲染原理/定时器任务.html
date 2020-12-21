@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    Promise.resolve().then(() => {
+        console.log('Promise1')
+        setTimeout(() => {
+            console.log('setTimeout2')    
+        }, 0);
+    })
+    setTimeout(() => {
+        console.log('setTimeout1');
+        Promise.resolve().then(() => {
+            console.log('Promise2')
+        })
+    }, 0);
+    /*
+    微任务  [promise1] 
+    宏任务 [setTimeout1]
+
+    1、执行第一个promise，则打印Promise1，setTimeout2进入宏任务队列
+    此时微任务 [] 
+    此时 宏任务 [setTimeout1，setTimeout2]
+    2、取出一个宏任务执行，则打印setTimeout1，
+    此时微任务队列：[promise2] 
+    宏任务执行完毕之后，清空对应的微任务则打印Promise2
+    3、此时任务队列中只有一个宏任务[setTimeout2]
+    取出一个宏任务执行，则打印setTimeout2，
+    所以执行结果是Promise1，setTimeout1，Promise2，setTimeout2
+   */
+    
+</script>
+</html>

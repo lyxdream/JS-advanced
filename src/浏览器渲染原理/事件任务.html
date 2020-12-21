@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="button">点我</button>
+</body>
+<script>
+    button.addEventListener('click',()=>{
+        console.log('listener1');
+        Promise.resolve().then(()=>console.log('micro task1'))
+    })
+    button.addEventListener('click',()=>{
+        console.log('listener2');
+        Promise.resolve().then(()=>console.log('micro task2'))
+    })
+    button.click(); // click1() click2()
+    //button.click() listener1 listener2  micro task1  micro task2  立即执行，而不是一个个执行，不点就不会产生一个⌚事件线程，就同步了
+    
+    //宏任务是一个个执行
+    //如果手动去点，则是一个个去执行，会产生事件线程  listener1    micro task1   listener2 micro task2
+</script>
+</html>

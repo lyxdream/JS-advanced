@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    // document.body.style.background = 'red';
+    // console.log(1)
+    // Promise.resolve().then(()=>{
+    //     console.log(2)
+    //     document.body.style.background = 'yellow';
+    // })
+    // console.log(3);
+    // //1 3 2
+    // //微任务执行完毕之后才会取渲染页面，所以直接是'yellow'
+
+
+    document.body.style.background = 'red';
+    console.log(1)
+    setTimeout(()=>{
+        console.log(2)
+        document.body.style.background = 'yellow';
+    },1000)
+    console.log(3);
+    //1 3 2 红变黄   渲染了两次，第一次走同步代码，页面为红，第二次取出一个宏任务，会变黄
+</script>
+</html>
