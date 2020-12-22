@@ -22,6 +22,8 @@
     微任务:then
     宏任务（如script脚本） =》清空所有微任务 =》取出一个宏任务 
    
+    宏任务：script,setTimeout ui渲染  setImmediate (ie下才执行)  messageChannel  
+    微任务:then
 
 */
 
