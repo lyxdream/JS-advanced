@@ -22,8 +22,23 @@
     微任务:then
     宏任务（如script脚本） =》清空所有微任务 =》取出一个宏任务 
    
-    宏任务：script,setTimeout ui渲染  setImmediate (ie下才执行)  messageChannel  
-    微任务:then
-
+    宏任务：script,setTimeout ui渲染  setImmediate (ie下才执行)  messageChannel  requestAnimationFrame  node(i/o)
+    微任务:promise.then  
+    - MutationObserver  接口提供了监视对DOM树所做更改的能力 (MutationObserver 对 DOM 的观察不会立即启动；而必须先调用 observe() 方法来确定，要监听哪一部分的 DOM 以及要响应哪些更改。)  
+    - queueMicrotask (promise.then)
+    queueMicrotask(() => {
+        console.log('queueMicrotask');
+    });
+   以下是mdn中的介绍：
+    下面的代码是一份 queueMicrotask() 的 polyfill。它通过使用立即 resolve 的 promise 创建一个微任务（microtask），如果无法创建 promise，则回落（callback）到使用setTimeout()。
+    if (typeof window.queueMicrotask !== "function") {
+      window.queueMicrotask = function (callback) {
+        Promise.resolve()
+          .then(callback)
+          .catch(e => setTimeout(() => { throw e; }));
+      };
+    }
+   - node中process.nextTick
+    
 */
 
